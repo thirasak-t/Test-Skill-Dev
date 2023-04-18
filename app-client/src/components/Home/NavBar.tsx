@@ -1,10 +1,50 @@
-import { Box, AppBar, Typography, Button, IconButton, Toolbar } from "@mui/material";
+import { Box, AppBar, Typography, Button, IconButton, Toolbar, Avatar } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import userState from "../../recoil/user";
+import { useEffect, useMemo, useState } from "react";
+import MenuDropDown, { menuOption } from "./MenuDropDown";
+import { useAuth } from "../AuthProvider";
 
 function NavBar() {
     const navigate = useNavigate();
+    const { logout } = useAuth();
+    const user = useRecoilValue(userState);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [options, setOptions] = useState<menuOption[]>([]);
+    const open = useMemo(() => Boolean(anchorEl), [anchorEl]);
+    const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const logoutOption = useMemo(() => {
+        return {
+            icon: <LogoutIcon />,
+            label: "Logout",
+            onClick: () => logout(),
+        };
+    }, []);
+
+    const profileOption = useMemo(() => {
+        return {
+            icon: <AccountCircleIcon />,
+            label: "Profile",
+            onClick: () => {
+                navigate("/profile");
+            },
+        };
+    }, []);
+
+    useEffect(() => {
+        setOptions([profileOption, logoutOption]);
+    }, [logoutOption, profileOption]);
+
     return (
         <>
             <Box sx={{ flexGrow: 1 }}>
@@ -23,18 +63,41 @@ function NavBar() {
                             </Typography>
                         </Box>
 
-                        <Button sx={{ mr: 1 }} variant="text" color="secondary" onClick={() => navigate("/signup")}>
-                            Sign Up
-                        </Button>
-                        <Button sx={{ mr: 1 }} variant="text" color="secondary" onClick={() => navigate("/login")}>
-                            Log in
-                        </Button>
-                        {/* <IconButton onClick={() => {}}>
-                            <AccountCircleIcon />
-                        </IconButton>
-                        <IconButton onClick={() => {}}>
-                            <LogoutIcon />
-                        </IconButton> */}
+                        {user.userId ? (
+                            <>
+                                <IconButton onClick={handleMenu}>
+                                    <Avatar
+                                        src={`data:image/(jpeg|png|bmp|jpg);base64,${user.profileImage}`}
+                                        sx={{ width: { xs: 24, sm: 36 }, height: { xs: 24, sm: 36 } }}
+                                    />
+                                </IconButton>
+                                <MenuDropDown
+                                    anchorEl={anchorEl}
+                                    options={options}
+                                    open={open}
+                                    handleClose={handleClose}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    sx={{ mr: 1 }}
+                                    variant="text"
+                                    color="secondary"
+                                    onClick={() => navigate("/register")}
+                                >
+                                    Sign Up
+                                </Button>
+                                <Button
+                                    sx={{ mr: 1 }}
+                                    variant="text"
+                                    color="secondary"
+                                    onClick={() => navigate("/login")}
+                                >
+                                    Log in
+                                </Button>
+                            </>
+                        )}
                     </Toolbar>
                 </AppBar>
             </Box>

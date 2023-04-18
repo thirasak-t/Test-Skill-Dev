@@ -1,6 +1,6 @@
 import React from "react";
 import NavBar from "../components/Home/NavBar";
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 
 function Home() {
     return (

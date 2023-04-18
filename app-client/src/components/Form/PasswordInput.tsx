@@ -4,7 +4,7 @@ import useReactHookFormError from "./useReactHookFormError";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-function PasswordInput<T>({
+function PasswordInput({
     color,
     name,
     label,

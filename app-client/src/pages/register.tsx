@@ -8,23 +8,45 @@ import { useNavigate } from "react-router-dom";
 import Input from "../components/Form/Input";
 import PasswordInput from "../components/Form/PasswordInput";
 import ImageUploader from "../components/Form/ImageUploader";
+import { passwordRegExp, usernameRegExp } from "../constants/RegExp";
+import { toast } from "react-hot-toast";
 
-type SignUpForm = {
+type RegisterProfileForm = {
     username: string;
     password: string;
     firstname: string;
     lastname: string;
-    img: File;
+    img: string;
 };
 
-const SignUpSchema = yup.object({
-    username: yup.string().required("กรุณากรอกชื่อผู้ใช้งาน"),
-    password: yup.string().required("กรุณากรอกรหัสผ่าน"),
-    firstname: yup.string().required("กรุณากรอกชื่อ"),
-    img: yup.string().required("กรุณาอัพโหลดรูปภาพโปรไฟล์"),
+const RegisterProfileSchema = yup.object({
+    username: yup
+        .string()
+        .required("กรุณากรอกชื่อผู้ใช้งานที่มีความยาว 4 - 12 ตัวอักษร")
+        .matches(usernameRegExp, "ชื่อผู้ใช้ต้องเป็น A-Z, a-z, 0-9, _ (ขีดเส้นใต้) ที่มีความยาว 4 - 12 ตัวอักษร"),
+    password: yup
+        .string()
+        .required("กรุณากรอกรหัสผ่านที่มีความยาวไม่ต่ำกว่า 6 ตัวอักษร")
+        .matches(passwordRegExp, "รหัสผ่านต้องไม่ต่ำกว่า 6 ตัวอักษร")
+        .test("password", "ต้องไม่มีตัวเรียงหรือตัวอักษรเรียงเป็นลำดับ เช่น 123456, abcdef", (val) => {
+            for (let i = 0; i < val.length - 1; i++) {
+                const charCode = val.charCodeAt(i);
+                const nextCharCode = val.charCodeAt(i + 1);
+                if (nextCharCode !== charCode + 1) {
+                    return true;
+                }
+            }
+            return false;
+        }),
+    firstname: yup
+        .string()
+        .required("กรุณากรอกชื่อจริงโดยมีขนาดไม่เกิน 60 ตัวอักษร")
+        .max(60, "ชื่อจริงต้องไม่เกิน 60 ตัวอักษร"),
+    lastname: yup.string().max(60, "นามสกุลต้องไม่เกิน 60 ตัวอักษร"),
+    img: yup.string().required("กรุณาอัพโหลดรูปภาพที่มีขนาดไม่เกิน 5MB"),
 });
 
-function SignUp() {
+function Register() {
     const navigate = useNavigate();
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down("md"));
@@ -33,18 +55,24 @@ function SignUp() {
         watch,
         control,
         setValue,
+        setError,
         formState: { isSubmitting },
         handleSubmit,
-    } = useForm<SignUpForm>({
+    } = useForm<RegisterProfileForm>({
         defaultValues: {
             username: "",
             password: "",
+            firstname: "",
+            lastname: "",
+            img: "",
         },
-        resolver: yupResolver(SignUpSchema),
+        resolver: yupResolver(RegisterProfileSchema),
     });
+    const img = watch("img");
 
-    const onSubmit: SubmitHandler<SignUpForm> = async (data) => {
-        //Register
+    const onSubmit: SubmitHandler<RegisterProfileForm> = async (data) => {
+        console.log(data);
+        toast.success("ลงทะเบียนสำเร็จ");
     };
 
     return (
@@ -142,6 +170,9 @@ function SignUp() {
                         control={control}
                         name={"img"}
                         sx={{ width: matches ? 1 : "500px", minWidth: "300px" }}
+                        img={img}
+                        setValue={(_img: string) => setValue("img", _img)}
+                        setError={(_error: string) => setError("img", { message: _error })}
                     />
 
                     {isSubmitting ? (
@@ -157,4 +188,4 @@ function SignUp() {
     );
 }
 
-export default SignUp;
+export default Register;

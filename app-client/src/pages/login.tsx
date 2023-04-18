@@ -7,6 +7,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import Input from "../components/Form/Input";
 import PasswordInput from "../components/Form/PasswordInput";
+import { toast } from "react-hot-toast";
+import { useSetRecoilState } from "recoil";
+import userState from "../recoil/user";
+import { userMockup } from "../models/mockup/user";
+import { useAuth } from "../components/AuthProvider";
 
 type loginForm = {
     username: string;
@@ -22,6 +27,8 @@ function Login() {
     const navigate = useNavigate();
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down("md"));
+    const setUser = useSetRecoilState(userState);
+    const { login } = useAuth();
 
     const {
         control,
@@ -36,7 +43,10 @@ function Login() {
     });
 
     const onSubmit: SubmitHandler<loginForm> = async (data) => {
-        //login
+        login(data);
+        toast.success("ลงชื่อเข้าใช้งานสำเร็จ");
+        setUser(userMockup);
+        navigate("/");
     };
     return (
         <Box
@@ -115,15 +125,19 @@ function Login() {
                         </Button>
                     )}
                 </form>
-                <Link
-                    onClick={() => {
-                        navigate("/signup");
-                    }}
-                    m={2}
-                    sx={{ cursor: "pointer" }}
-                >
-                    Sign Up
-                </Link>
+                <Box display={"flex"}>
+                    <Typography margin={"auto"}>Need an account? </Typography>
+                    <Link
+                        onClick={() => {
+                            navigate("/register");
+                        }}
+                        mx={0.5}
+                        fontSize={"1rem"}
+                        sx={{ cursor: "pointer" }}
+                    >
+                        Register
+                    </Link>
+                </Box>
             </Container>
         </Box>
     );

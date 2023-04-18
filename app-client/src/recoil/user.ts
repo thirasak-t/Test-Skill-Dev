@@ -1,9 +1,9 @@
 import { atom } from "recoil";
 import User from "../models/UserModel";
 
-const usersState = atom({
-  key: "user",
-  default: [] as User[],
+const userState = atom({
+    key: "user",
+    default: {} as User,
 });
 
-export default usersState;
+export default userState;
