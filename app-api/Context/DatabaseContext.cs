@@ -11,6 +11,14 @@ namespace app_api.Context
         }
 
         public DbSet<User> Users { get; set; }
-        
+        public DbSet<PasswordHistory> PasswordHistories { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PasswordHistory>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.PasswordHistories)
+                .HasForeignKey(p => p.UserId);
+        }
     }
 }

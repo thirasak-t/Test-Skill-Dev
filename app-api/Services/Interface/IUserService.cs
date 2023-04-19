@@ -7,7 +7,8 @@ namespace app_api.Services.Interface
     {
         public Task<ResponseUser> CreateUser(RequestRegister user);
         public Task<ResponseUser> UpdateUser(RequestUpdateProfile user);
-        public Task UpdatePassword(RequestUpdatePassword user, Guid userId);
+        public Task UpdatePassword(string newPassword, Guid userId);
+        public Task<string> VerifyNewPassword(string hashedNewPassword, Guid userId);
         public Task<ResponseUser> GetUser(Guid userId);
         public Task<ResponseUser> GetUserByUsername(string username);
         public Task<bool> VerifyPassword(string password, string username);

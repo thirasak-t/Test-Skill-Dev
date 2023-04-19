@@ -85,10 +85,16 @@ namespace app_api.Controllers
         {
             var user = await _userService.GetUser(userId);
             var isMatched = await _userService.VerifyPassword(request.CurrentPassword, user.Username);
-            Console.WriteLine("isMatched: "+isMatched);
+            
             if (isMatched)
             {
-                await _userService.UpdatePassword(request, userId);
+                var hashedNewPassword = await _userService.VerifyNewPassword(request.NewPassword, userId);
+                
+                if (hashedNewPassword == null)
+                {
+                    return BadRequest("รหัสผ่านใหม่ซ้ำกับรหัสผ่าน 5 ครั้งล่าสุด");
+                }
+                await _userService.UpdatePassword(hashedNewPassword, userId);
                 return Ok();
             }
             else

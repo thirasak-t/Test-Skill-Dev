@@ -77,11 +77,17 @@ namespace app_api.Services
                 IsActive = true
             };
 
-            
+            var passwordHistory = new PasswordHistory
+            {
+                UserId = newUser.Id,
+                PasswordHash = hashedPassword,
+                CreatedAt = DateTime.Now
+            };
 
             try
             {
                 _dbContext.Users.Add(newUser);
+                _dbContext.PasswordHistories.Add(passwordHistory);
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -130,17 +136,43 @@ namespace app_api.Services
 
             };
         }
-        public async Task UpdatePassword(RequestUpdatePassword request, Guid userId)
+
+        public async Task<string> VerifyNewPassword(string newPassword, Guid userId)
+        {
+            
+            var passwords = await _dbContext.PasswordHistories.Where(ph => ph.UserId == userId)
+                .OrderByDescending(ph => ph.CreatedAt)
+                .Take(5)
+                .ToListAsync();
+            string hashedNewPassword = await HashPassword(newPassword);
+
+            foreach (var password in passwords)
+            {
+                
+                if (hashedNewPassword.Equals(password.PasswordHash))
+                {
+                    return null;
+                }
+            }
+            return hashedNewPassword;
+        }
+        public async Task UpdatePassword(string hashedNewPassword, Guid userId)
         {
 
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-
-            string hashedNewPassword = await HashPassword(request.NewPassword);
             user.PasswordHash = hashedNewPassword;
             user.LastModifiedOn = DateTime.Now;
 
+
+            var passwordHistory = new PasswordHistory
+            {
+                UserId = userId,
+                PasswordHash = hashedNewPassword,
+                CreatedAt = DateTime.Now
+            };
             try
             {
+                await _dbContext.PasswordHistories.AddAsync(passwordHistory);
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)

@@ -68,6 +68,7 @@ function ChangePassword({ turnOffChangePassword }: ChangePasswordProps) {
     const {
         reset,
         control,
+        setError,
         formState: { isSubmitting },
         handleSubmit,
     } = useForm<ChangePasswordForm>({
@@ -85,10 +86,18 @@ function ChangePassword({ turnOffChangePassword }: ChangePasswordProps) {
     };
 
     const onSubmit: SubmitHandler<ChangePasswordForm> = async (data) => {
-        updatePassword(data, user.userId).then(() => {
-            turnOffChangePassword();
-            toast.success("เปลี่ยนรหัสผ่านสำเร็จ");
-        });
+        updatePassword(data, user.userId)
+            .then(() => {
+                turnOffChangePassword();
+                toast.success("เปลี่ยนรหัสผ่านสำเร็จ");
+            })
+            .catch((err) => {
+                if (err.status === 400) {
+                    setError("newPassword", { message: "รหัสผ่านใหม่ซ้ำกับรหัสผ่าน 5 ครั้งล่าสุด" });
+                } else if (err.status === 401) {
+                    setError("currentPassword", { message: "รหัสผ่านปัจจุบันไม่ถูกต้อง" });
+                }
+            });
     };
 
     return (

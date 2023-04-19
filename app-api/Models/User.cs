@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity;
 
 namespace app_api.Models
 {
@@ -8,8 +7,9 @@ namespace app_api.Models
     {
         public User()
         {
-            CreatedOn = DateTimeOffset.UtcNow;
+            CreatedOn = DateTime.Now;
         }
+
         [Required, Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; } = Guid.NewGuid();
@@ -22,7 +22,9 @@ namespace app_api.Models
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset LastModifiedOn { get; set; }
         public bool IsActive { get; set; }
-
-
+        public ICollection<PasswordHistory> PasswordHistories
+        {
+            get; set;
+        }
     }
 }
