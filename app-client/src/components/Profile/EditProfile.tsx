@@ -8,12 +8,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { SetterOrUpdater } from "recoil";
 import { useEffect } from "react";
-
-type EditProfileForm = {
-    firstname: string;
-    lastname: string;
-    img: string;
-};
+import { EditProfileForm } from "../../models/contracts/Form";
+import { updateProfile } from "../../fetch/fetchUser";
 
 const EditProfileSchema = yup.object({
     firstname: yup
@@ -21,7 +17,7 @@ const EditProfileSchema = yup.object({
         .required("กรุณากรอกชื่อจริงโดยมีขนาดไม่เกิน 60 ตัวอักษร")
         .max(60, "ชื่อจริงต้องไม่เกิน 60 ตัวอักษร"),
     lastname: yup.string().max(60, "นามสกุลต้องไม่เกิน 60 ตัวอักษร"),
-    img: yup.string().required("กรุณาอัพโหลดรูปภาพที่มีขนาดไม่เกิน 5MB"),
+    profileImage: yup.string().required("กรุณาอัพโหลดรูปภาพที่มีขนาดไม่เกิน 5MB"),
 });
 
 interface EditProfileProps {
@@ -43,9 +39,9 @@ function EditProfile({ user, setEditIsOff, setUser }: EditProfileProps) {
         handleSubmit,
     } = useForm<EditProfileForm>({
         defaultValues: {
-            firstname: user.firstName,
-            lastname: user.lastName,
-            img: user.profileImage,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            profileImage: user.profileImage,
         },
         resolver: yupResolver(EditProfileSchema),
     });
@@ -54,21 +50,14 @@ function EditProfile({ user, setEditIsOff, setUser }: EditProfileProps) {
         reset();
         setEditIsOff();
     };
-    const img = watch("img");
-    useEffect(() => {
-        console.log(img);
-    }, [img]);
+    const img = watch("profileImage");
+
     const onSubmit: SubmitHandler<EditProfileForm> = async (data) => {
-        setEditIsOff();
-        setUser((_user) => {
-            return {
-                ..._user,
-                firstName: data.firstname,
-                lastName: data.lastname,
-                profileImage: data.img,
-            } as User;
+        updateProfile({ userId: user.userId, ...data }).then((res) => {
+            setUser(res);
+            toast.success("แก้ไขโปรไฟล์สำเร็จ");
+            setEditIsOff();
         });
-        toast.success("แก้ไขโปรไฟล์สำเร็จ");
     };
 
     return (
@@ -88,14 +77,14 @@ function EditProfile({ user, setEditIsOff, setUser }: EditProfileProps) {
         >
             <ImageUploader
                 control={control}
-                name={"img"}
+                name={"profileImage"}
                 sx={{ width: matches ? 1 : "500px", minWidth: "300px" }}
                 img={img}
                 setValue={(_img: string) => {
-                    setValue("img", _img);
+                    setValue("profileImage", _img);
                 }}
                 setError={(_error: string) => {
-                    setError("img", { message: _error });
+                    setError("profileImage", { message: _error });
                 }}
             />
 

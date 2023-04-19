@@ -8,6 +8,8 @@ import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material/s
 import Theme from "./theme";
 import Profile from "./pages/profile";
 import { AuthProvider } from "./components/AuthProvider";
+import { RequireAuth } from "./components/RequireAuth";
+import LoginAndRegisterLayout from "./components/LoginAndRegisterLayout";
 
 function App() {
     const theme = responsiveFontSizes(createTheme(Theme()));
@@ -29,13 +31,34 @@ function App() {
                         <Route path="/" element={<Home />} />
                     </Routes>
                     <Routes>
-                        <Route path="/login" element={<Login />} />
+                        <Route
+                            path="/login"
+                            element={
+                                <LoginAndRegisterLayout>
+                                    <Login />
+                                </LoginAndRegisterLayout>
+                            }
+                        />
                     </Routes>
                     <Routes>
-                        <Route path="/Register" element={<Register />} />
+                        <Route
+                            path="/Register"
+                            element={
+                                <LoginAndRegisterLayout>
+                                    <Register />
+                                </LoginAndRegisterLayout>
+                            }
+                        />
                     </Routes>
                     <Routes>
-                        <Route path="/profile" element={<Profile />} />
+                        <Route
+                            path="/profile"
+                            element={
+                                <RequireAuth>
+                                    <Profile />
+                                </RequireAuth>
+                            }
+                        />
                     </Routes>
                 </AuthProvider>
             </Router>

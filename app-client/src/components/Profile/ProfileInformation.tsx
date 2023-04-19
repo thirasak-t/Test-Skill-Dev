@@ -29,10 +29,10 @@ function ProfileInformation({ user, setEditIsOn, turnOnChangePassword }: Profile
                 <Base64Image height="200px" width="200px" img={user.profileImage} />
             </Box>
             <Typography variant="h4">
-                {user.firstName} {user.lastName}
+                {user.firstname} {user.lastname}
             </Typography>
 
-            <Typography variant="h6">Username: {user.userName}</Typography>
+            <Typography variant="h6">Username: {user.username}</Typography>
 
             <Button variant="contained" onClick={setEditIsOn}>
                 edit profile

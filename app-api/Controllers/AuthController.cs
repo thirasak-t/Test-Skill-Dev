@@ -9,46 +9,43 @@ using System.Threading.Tasks;
 
 namespace app_api.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
        
-        private readonly IAuthService _authService;
-        private readonly ILogger<AuthController> _logger;
+
+        private readonly IUserService _userService;
 
         public AuthController(
-            ILogger<AuthController> logger,
-            IAuthService authService)
+            IUserService userService)
         {
-            _logger = logger;
-            _authService = authService;
+            _userService = userService;
 
         }
 
 
-        [AllowAnonymous]
         [HttpPost("login")]
-        [Produces("application/json")]
+       
         public async Task<IActionResult> Login([FromBody] AuthContract contract)
         {
             if (string.IsNullOrEmpty(contract.Username) || string.IsNullOrEmpty(contract.Password))
-                return new BadRequestObjectResult("กรุณากรอกข้อมูลให้ครบถ้วย");
+                return BadRequest("กรุณากรอกข้อมูลให้ครบถ้วน");
 
-           
-
-            return Ok(new AuthRespone()
+            var isMatched = await _userService.VerifyPassword(contract.Password, contract.Username);
+            if (isMatched)
             {
-                Token= "User = "+contract.Username
-            });
+                var user = await _userService.GetUserByUsername(contract.Username);
+                return Ok(user);
+            }
+            else
+            {
+                return Unauthorized("รหัสผ่านไม่ถูกต้อง");
+            }
+            
         }
 
-        [HttpPost("logout")]
-        public async Task Logout()
-        {
-            await _authService.Logout(DateTime.Now);
-        }
+
     }
 
 

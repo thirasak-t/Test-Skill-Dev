@@ -11,7 +11,7 @@ namespace app_api.Contracts
         public string Password { get; set; }
     }
 
-    public class AuthRespone
+    public class ResponseLogin
     {
         public string Token { get; set; }
     }

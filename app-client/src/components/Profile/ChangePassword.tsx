@@ -5,12 +5,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import PasswordInput from "../Form/PasswordInput";
 import { passwordRegExp } from "../../constants/RegExp";
-
-type ChangePasswordForm = {
-    currentPassword: string;
-    newPassword: string;
-    confirmNewPassword: string;
-};
+import { ChangePasswordForm } from "../../models/contracts/Form";
+import { useRecoilValue } from "recoil";
+import userState from "../../recoil/user";
+import { updatePassword } from "../../fetch/fetchUser";
 
 const ChangePasswordSchema = yup.object({
     currentPassword: yup
@@ -66,6 +64,7 @@ interface ChangePasswordProps {
 function ChangePassword({ turnOffChangePassword }: ChangePasswordProps) {
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down("md"));
+    const user = useRecoilValue(userState);
     const {
         reset,
         control,
@@ -86,8 +85,10 @@ function ChangePassword({ turnOffChangePassword }: ChangePasswordProps) {
     };
 
     const onSubmit: SubmitHandler<ChangePasswordForm> = async (data) => {
-        turnOffChangePassword();
-        toast.success("เปลี่ยนรหัสผ่านสำเร็จ");
+        updatePassword(data, user.userId).then(() => {
+            turnOffChangePassword();
+            toast.success("เปลี่ยนรหัสผ่านสำเร็จ");
+        });
     };
 
     return (

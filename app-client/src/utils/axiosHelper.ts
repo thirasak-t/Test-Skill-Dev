@@ -25,7 +25,7 @@ axios.interceptors.response.use(
     },
     function (error: AxiosError) {
         //@ts-ignore
-        toast.error(error?.response?.data?.message);
+        toast.error(error.response?.data as any);
         return Promise.reject(error.response);
     }
 );

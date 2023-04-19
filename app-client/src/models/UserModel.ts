@@ -1,7 +1,7 @@
 export default interface User {
     userId: string;
-    userName: string;
-    firstName: string;
-    lastName: string;
+    username: string;
+    firstname: string;
+    lastname: string;
     profileImage: string;
 }

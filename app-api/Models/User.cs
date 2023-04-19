@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace app_api.Models
 {
-    public class User : IdentityUser<Guid>
+    public class User
     {
         public User()
         {
@@ -13,14 +13,15 @@ namespace app_api.Models
         [Required, Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string Username { get; set; }
+        public string? Password { get; set; }
+        public string Firstname { get; set; }
+        public string? Lastname { get; set; }
         public string PasswordHash { get; set; }
         public string ProfileImage { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset LastModifiedOn { get; set; }
+        public bool IsActive { get; set; }
 
 
     }
